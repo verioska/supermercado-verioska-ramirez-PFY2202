@@ -1,0 +1,13 @@
+import { Building2, Store, House, MapPin, Clock, ArrowUpRight, ShoppingBasket } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { stores } from '../data.js';
+
+const icons = { building: Building2, store: Store, house: House };
+export default function Stores() {
+  return <>
+    <section className="page-intro stores-intro"><div><p className="eyebrow"><span className="tiny-dot" /> NUESTRAS TIENDAS</p><h1>Tu barrio.<br /><span>Tu Mercadito.</span></h1><p className="intro-copy">Tres puntos de encuentro para tus compras de cada día.<br className="desktop-break" /> Encuentra tu tienda y ven a visitarnos.</p></div><div className="store-summary"><span className="icon-tile sage"><MapPin size={27} /></span><strong>03</strong><span>tiendas en Santiago</span><small>La misma cercanía, en cada una.</small></div></section>
+    <section className="stores-section" aria-labelledby="stores-title"><div className="section-heading"><div><h2 id="stores-title">Siempre a la vuelta</h2><p className="muted">Direcciones y horarios para organizar tu visita.</p></div><span className="region-label"><MapPin size={15} />Región Metropolitana</span></div><div className="stores-grid">{stores.map((store, index) => { const Icon = icons[store.icon]; return <article key={store.id} className="store-card"><div className={`store-illustration ${store.color}`} aria-hidden="true"><span className="store-number">0{index + 1}</span><Icon size={99} strokeWidth={1.1} /><span className="store-art-word">mercadito<span>✳</span></span><span className="illustration-sun" /></div><div className="store-body"><span className="store-district">{store.district.toUpperCase()}</span><h3>{store.name}</h3><div className="store-detail"><MapPin size={18} /><p>{store.address}<br /><span>{store.district}, Santiago</span></p></div><div className="store-detail"><Clock size={18} /><p>{store.hours}<br /><span>{store.sunday}</span></p></div><a className="store-map-link" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${store.address}, ${store.district}, Santiago, Chile`)}`} target="_blank" rel="noreferrer">Ver ubicación en Google Maps<ArrowUpRight size={17} /><span className="sr-only"> (abre en otra pestaña)</span></a></div></article>; })}</div></section>
+    <div className="store-bottom-note"><ShoppingBasket size={25} /><div><strong>El mismo cuidado en todas nuestras tiendas.</strong><p>Consulta los productos registrados y filtra el inventario por sucursal.</p></div><Link to="/" className="text-link">Ir al inventario<ArrowUpRight size={17} /></Link></div>
+    <p className="demo-note">Proyecto académico: las tiendas, direcciones y horarios son ilustrativos; no corresponden a locales comerciales reales.</p>
+  </>;
+}
