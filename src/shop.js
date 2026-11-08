@@ -4,8 +4,6 @@ import { isValidInventory, validateProduct } from './inventory.js';
 export const STORAGE_KEY = 'mercadito-shop-v2';
 export const createInitialShop = () => ({ products: initialProducts.map((product) => ({ ...product })), cart: [], error: '' });
 
-// El stock representa las existencias disponibles; el carrito reserva las demás.
-// Una sola transición cambia ambos para mantener siempre el total de unidades.
 export function shopReducer(state, action) {
   const fail = (error) => ({ ...state, error });
   const product = state.products.find((item) => item.id === action.id);

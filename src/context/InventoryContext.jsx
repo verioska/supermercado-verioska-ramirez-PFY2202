@@ -17,7 +17,6 @@ export function InventoryProvider({ children }) {
 
   useEffect(() => {
     try {
-      // Inventario y carrito se guardan juntos para no restaurar reservas a medias.
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ products: state.products, cart: state.cart }));
       setStorageError('');
     } catch { setStorageError('Los cambios se conservarán solo durante esta sesión: el navegador no permite guardar los datos.'); }
