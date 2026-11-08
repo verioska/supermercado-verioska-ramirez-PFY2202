@@ -3,7 +3,7 @@ import { X, PackagePlus, Save } from 'lucide-react';
 import { categories, stores, categoryIcons } from '../data.js';
 import { validateProduct } from '../inventory.js';
 
-export default function ProductDialog({ product, products, onSave, onClose }) {
+export default function ProductDialog({ product, products, reserved = 0, onSave, onClose }) {
   const dialog = useRef(null);
   const [error, setError] = useState('');
   const editing = Boolean(product?.id);
@@ -25,6 +25,8 @@ export default function ProductDialog({ product, products, onSave, onClose }) {
     const next = {
       ...values,
       id: product?.id ?? crypto.randomUUID(),
+      store: reserved ? product.store : values.store,
+      unit: reserved ? product.unit : values.unit,
       name: values.name.trim(),
       sku: values.sku.trim().toUpperCase(),
       price: Number(values.price),
@@ -34,6 +36,7 @@ export default function ProductDialog({ product, products, onSave, onClose }) {
     };
     const message = validateProduct(next, products);
     if (message) { setError(message); return; }
+    if (next.stock + reserved > 1000000) { setError('El stock disponible más lo reservado no puede superar 1.000.000.'); return; }
     onSave(next);
   }
 
@@ -46,12 +49,12 @@ export default function ProductDialog({ product, products, onSave, onClose }) {
         <label className="full">Nombre del producto<input name="name" defaultValue={product?.name} required maxLength={80} placeholder="Ej. Manzana verde" autoFocus /></label>
         <label>Código SKU<input name="sku" defaultValue={product?.sku} required maxLength={20} placeholder="Ej. FV-005" pattern="[a-zA-Z0-9-]{2,20}" /></label>
         <label>Categoría<select name="category" defaultValue={product?.category ?? categories[0]}>{categories.map((category) => <option key={category}>{category}</option>)}</select></label>
-        <label>Tienda<select name="store" defaultValue={product?.store ?? 'centro'}>{stores.map((store) => <option key={store.id} value={store.id}>{store.name}</option>)}</select></label>
-        <label>Unidad de medida<select name="unit" defaultValue={product?.unit ?? 'un'}><option value="un">Unidad</option><option value="kg">Kilogramo</option></select></label>
+        <label>Tienda<select name="store" disabled={reserved > 0} defaultValue={product?.store ?? 'centro'}>{stores.map((store) => <option key={store.id} value={store.id}>{store.name}</option>)}</select></label>
+        <label>Unidad de medida<select name="unit" disabled={reserved > 0} defaultValue={product?.unit ?? 'un'}><option value="un">Unidad</option><option value="kg">Kilogramo</option></select></label>
         <label className="full">Precio por unidad o kg (CLP)<input type="number" name="price" defaultValue={product?.price} required min="1" max="10000000" step="1" placeholder="1990" /></label>
-        <label>Stock actual<input type="number" name="stock" defaultValue={product?.stock ?? 0} required min="0" max="1000000" step="1" /></label>
+        <label>Stock disponible<input type="number" name="stock" defaultValue={product?.stock ?? 0} required min="0" max="1000000" step="1" /></label>
         <label>Stock mínimo<input type="number" name="minimum" defaultValue={product?.minimum ?? 5} required min="0" max="1000000" step="1" /></label>
-        <p className="field-help full">Se mostrará una alerta cuando el stock sea igual o inferior al mínimo.</p>
+        <p className="field-help full">Se mostrará una alerta cuando el stock sea igual o inferior al mínimo. {reserved > 0 && `Hay ${reserved} ${product.unit} reservados en el carrito; no se incluyen en el stock disponible. Para cambiar la tienda o unidad, retíralos primero del carrito.`}</p>
         {error && <p className="form-error full" role="alert">{error}</p>}
         <div className="dialog-actions full"><button className="button secondary" type="button" onClick={onClose}>Cancelar</button><button className="button primary" type="submit"><Save size={17} />{editing ? 'Guardar cambios' : 'Agregar producto'}</button></div>
       </form>
